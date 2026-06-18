@@ -21,9 +21,10 @@ export class Alert {
   async confirmAlert(
     header: string,
     message: string,
-    funcionOk: Function,
     cancelText: string = 'Cancelar',
-    confirmText: string = 'Aceptar'
+    confirmText: string = 'Aceptar',
+    funcionOk: Function,
+    
   )
 
   {
