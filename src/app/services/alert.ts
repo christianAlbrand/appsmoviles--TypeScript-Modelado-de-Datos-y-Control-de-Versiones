@@ -21,8 +21,8 @@ export class Alert {
   async confirmAlert(
     header: string,
     message: string,
-    cancelText: string = 'Cancelar',
     confirmText: string = 'Aceptar',
+    cancelText: string = 'Cancelar',
     funcionOk: Function,
     
   )

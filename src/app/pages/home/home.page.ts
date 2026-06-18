@@ -7,6 +7,7 @@ import { Task } from '../../models/task.models';
 import {addIcons} from 'ionicons';
 import {addOutline, addCircleOutline, trashOutline} from 'ionicons/icons';
 import { Alert } from 'src/app/services/alert';
+import {Preferences} from '@capacitor/preferences';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +20,7 @@ export class HomePage implements OnInit {
 
   newTaskStr: string = '';
   public alertService: Alert = inject(Alert);
+  private readonly KEY_TASKS = 'local_key_task';
 
   tasks: Task[] = [
     {
@@ -46,7 +48,7 @@ export class HomePage implements OnInit {
     console.log(this.tasks);
   }
 
-  addTask() {
+  async addTask() {
     console.log(this.newTaskStr);
     const newTask: Task = {
       id: Date.now(),
@@ -70,16 +72,18 @@ export class HomePage implements OnInit {
     }
 
     this.tasks.push(newTask);
+    await this.saveTaskOnLocal();
     console.log(this.tasks);
     this.alertService.showAlert('Tarea agregada', `La tarea "${newTask.titulo}" ha sido agregada exitosamente.`);
     this.newTaskStr = '';
   }
 
-  deleteTask(taskRemove: Task) {
+  async deleteTask(taskRemove: Task) {
     const index = this.tasks.findIndex(task => task.id === taskRemove.id);
 
     if (index !== -1) {
       this.tasks.splice(index, 1);
+      await this.saveTaskOnLocal();
     }
   }
 
@@ -96,8 +100,27 @@ export class HomePage implements OnInit {
   actualizarPosiciones(event: ReorderEndCustomEvent) {
     console.log("El arreglo antes de reordenar:", this.tasks);
     this.tasks = event.detail.complete(this.tasks);
+    this.saveTaskOnLocal();
     console.log("El arreglo después de reordenar:", this.tasks);
   }
+
+  async ionViewWillEnter() {
+    const taskPreferences = await Preferences.get({ key: this.KEY_TASKS });
+    if (taskPreferences.value) {
+      const tasks = JSON.parse(taskPreferences.value);
+      if (Array.isArray(tasks)) {
+        this.tasks = tasks;
+      }
+    }
+  }
+
+  async saveTaskOnLocal(){
+    await Preferences.set({
+      key: this.KEY_TASKS,
+      value: JSON.stringify(this.tasks)
+    });
+  }
+  
   
 
   ngOnInit() {
