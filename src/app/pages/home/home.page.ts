@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonLabel, IonInput, IonButton, IonList, IonIcon} from '@ionic/angular/standalone';
 import { Task } from '../../models/task.models';
 import {addIcons} from 'ionicons';
 import {addOutline, addCircleOutline} from 'ionicons/icons';
+import { Alert } from 'src/app/services/alert';
 
 @Component({
   selector: 'app-home',
@@ -16,6 +17,7 @@ import {addOutline, addCircleOutline} from 'ionicons/icons';
 export class HomePage implements OnInit {
 
   newTaskStr: string = '';
+  public alertService: Alert = inject(Alert);
 
   tasks: Task[] = [
     {
@@ -67,7 +69,12 @@ export class HomePage implements OnInit {
 
     this.tasks.push(newTask);
     console.log(this.tasks);
+    this.alertService.showAlert('Tarea agregada', `La tarea "${newTask.titulo}" ha sido agregada exitosamente.`);
     this.newTaskStr = '';
+  }
+
+  confirmDelete(task:string){
+    console.log('Confirmacion para borrar la task: ${task}');
   }
 
   ngOnInit() {
